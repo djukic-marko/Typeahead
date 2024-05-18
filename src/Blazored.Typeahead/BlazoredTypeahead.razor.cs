@@ -398,7 +398,35 @@ namespace Blazored.Typeahead
 
         private async Task HookOutsideClick()
         {
-            await JSRuntime.OnOutsideClick(_searchInput, this, "ResetControlBlur", true);
+
+            //This methods sometimes throws this exception.
+            // Beter to catch it, than to break whole app.
+            // It occurs on high traffic Blazor Server app, few times a day.
+
+
+//            :Unhandled exception. System.Threading.Tasks.TaskCanceledException: A task was canceled.
+//    at Microsoft.JSInterop.JSRuntime.InvokeAsync[TValue](Int64 targetInstanceId, String identifier, Object[] args)
+//    at Blazored.Typeahead.BlazoredTypeahead`2.HookOutsideClick()
+//    at Blazored.Typeahead.BlazoredTypeahead`2.Search(Object source, ElapsedEventArgs e)
+//    at System.Threading.Tasks.Task.<> c.< ThrowAsync > b__128_1(Object state)
+//    at System.Threading.QueueUserWorkItemCallback.<> c.<.cctor > b__6_0(QueueUserWorkItemCallback quwi)
+//    at System.Threading.ExecutionContext.RunForThreadPoolUnsafe[TState](ExecutionContext executionContext, Action`1 callback, TState & state)
+//    at System.Threading.QueueUserWorkItemCallback.Execute()
+//    at System.Threading.ThreadPoolWorkQueue.Dispatch()
+//    at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
+//    at System.Threading.Thread.StartCallback()
+// Main process exited, code = killed, status = 6 / ABRT
+// Failed with result 'signal'.
+
+            try
+            {
+                await JSRuntime.OnOutsideClick(_searchInput, this, "ResetControlBlur", true);
+            }
+            catch (TaskCanceledException ex)
+            {
+               // TODO: 
+                
+            }
         }
 
         private async Task SelectResult(TItem item)
